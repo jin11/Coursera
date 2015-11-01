@@ -99,8 +99,11 @@ class Ship:
         self.radius = info.get_radius()
         
     def draw(self,canvas):
-        canvas.draw_image(self.image, self.image_center, self.image_size, self.pos, self.image_size, self.angle)
-    
+        if self.thrust:
+            canvas.draw_image(self.image, [130, 45], self.image_size, self.pos, self.image_size, self.angle)
+        else:
+            canvas.draw_image(self.image, self.image_center, self.image_size, self.pos, self.image_size, self.angle)
+
     def update(self):
         #ship angle
         self.angle += self.angle_vel
@@ -110,10 +113,15 @@ class Ship:
         self.pos[0] = (self.pos[0] + self.vel[0]) % WIDTH
         self.pos[1] = (self.pos[1] + self.vel[1]) % HEIGHT
         
+        press_key = 0.15 / 60
+        release_key = 0.10
+        self.vel[0] *= (1 - press_key)
+        self.vel[1] *= (1 - press_key)
+        
         if self.thrust:
             forward = angle_to_vector(self.angle)
-            self.vel[0] += .5 * forward[0]
-            self.vel[1] += .5 * forward[1]
+            self.vel[0] += .07 * forward[0]
+            self.vel[1] += .07 * forward[1]
             
     def thrusting(self, var):
         self.thrust = var
@@ -123,6 +131,16 @@ class Ship:
         
     def dec_angvel(self):
         self.angle_vel -= .05
+        
+        #add sound to thrust
+    def change_thrust(self, thrusting):
+        self.thrust = thrusting
+        if thrusting:
+            ship_thrust_sound.rewind()
+            ship_thrust_sound.play()
+        else:
+            ship_thrust_sound.pause()
+
 
     
     
